@@ -1,12 +1,8 @@
-from typing import Literal
-
 from config.validators import username_validators
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    AbstractUser,
     BaseUserManager,
     PermissionsMixin,
-    User,
     UserManager,
 )
 from django.db.models import BigAutoField, BooleanField, CharField, EmailField, Manager
@@ -16,13 +12,15 @@ from django.utils.translation import gettext_lazy as _
 
 
 class AccountManager(Manager):
-    def create_user(self, username: str, email: str, password: str | None = None):
+    def create_user(self, username: str, email: str, password: str | None = None, **extra_fields):
         if not username:
             raise ValueError("The given username must be set")
 
         email = BaseUserManager.normalize_email(email=email)
 
-        account: Account = self.model(username=username, email=email)
+        account: Account = self.model(
+            username=username, email=email, **extra_fields
+        )
         account.set_password(raw_password=password)
         account.save(using=self._db)
 
@@ -31,8 +29,18 @@ class AccountManager(Manager):
     def get_by_natural_key(self, username: str):
         return self.get(**{self.model.USERNAME_FIELD: username})
 
-    async def aget_by_natural_key(self, username: str):
-        return await self.aget(**{self.model.USERNAME_FIELD: username})
+    def create_superuser(self, username: str, email: str, password: str | None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(username=username, email=email, password=password, **extra_fields)
+
+    create_superuser.alters_data = True
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
@@ -47,9 +55,20 @@ class Account(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("email address"),
         unique=True
     )
+    is_staff = BooleanField(
+        _("staff status"),
+        default=False,
+        help_text=_(
+            "Designates whether the user can log into this admin site."
+        ),
+    )
     is_active = BooleanField(
-        verbose_name=_("is active"),
+        _("active"),
         default=True,
+        help_text=_(
+            "Designates whether this user should be treated as active. "
+            "Unselect this instead of deleting accounts."
+        ),
     )
 
     objects = AccountManager()

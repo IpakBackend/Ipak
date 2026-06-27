@@ -26,10 +26,10 @@ sys.path.append(os.path.join(BASE_DIR, "apps"))
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vwy$478*i&8*t@ea_*+o+rqxidus@+@$@ct%fg-yitu_m%zur9'
+SECRET_KEY = config(option="SECRET_KEY", default='', cast=str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config(option="DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -90,12 +90,28 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DB: bool = config(option="DB", default=False, cast=bool)
+
+if DB:
+    DATABASES = {
+        "default": {
+            "ENGINE": config(
+                option="DB_ENGINE", default="django.db.backends.sqlite3", cast=str
+            ),
+            "NAME": config(option="DB_NAME", default="db.sqlite3", cast=str),
+            "USER": config(option="DB_USER", default="postgres", cast=str),
+            "PASSWORD": config(option="DB_PASSWORD", default='', cast=str),
+            "HOST": config(option="DB_HOST", default='', cast=str),
+            "PORT": config(option="DB_PORT", default=5432, cast=int),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Redis
 
