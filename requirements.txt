@@ -1,0 +1,12 @@
+django
+django-filter
+django-ipware
+django-phonenumber-field[phonenumbers]
+django-redis
+django-rest-framework
+djangorestframework-simplejwt
+drf-spectacular
+drf-standardized-errors
+psycopg2-binary
+python-decouple
+redis
