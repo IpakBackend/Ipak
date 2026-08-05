@@ -1,13 +1,12 @@
 import random
 import string
+from secrets import token_urlsafe
 
 from django.contrib.auth.hashers import make_password
 from django.core.mail import EmailMessage
 from django_redis import get_redis_connection
 from redis.client import Redis
-from rest_framework.exceptions import Throttled
-from secrets import token_urlsafe
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import Throttled, ValidationError
 
 
 class OTPService:

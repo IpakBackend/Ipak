@@ -1,10 +1,21 @@
+from django.conf import settings
+from django.core import signing
 from django.core.mail import EmailMessage
 
 
-def send_otp_code(email: str, otp_code: str) -> None:
+def send_email_verification_link(user_id: int, email: str) -> None:
+    token: str = signing.dumps(
+        obj={"user_id": user_id},
+        salt="email-verification"
+    )
 
-    subject: str = "OTP code"
-    message:  str = "Your OTP code is: " + str(otp_code)
+    verification_link: str = settings.FRONTEND_URL + f"/verify-email/{token}/"
+
+    subject: str = "Email verification"
+    message: str = (
+        "<p>Click or copy the link below to verify your email:</p>"
+        f'<p><a href="{verification_link}">{verification_link}</a></p>'
+    )
 
     email_message = EmailMessage(
         subject=subject,

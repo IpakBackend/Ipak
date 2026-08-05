@@ -3,9 +3,15 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
-    UserManager,
 )
-from django.db.models import BigAutoField, BooleanField, CharField, EmailField, Manager
+from django.db.models import (
+    BigAutoField,
+    BooleanField,
+    CharField,
+    DateTimeField,
+    EmailField,
+    Manager,
+)
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -40,8 +46,6 @@ class AccountManager(Manager):
 
         return self.create_user(username=username, email=email, password=password, **extra_fields)
 
-    create_superuser.alters_data = True
-
 
 class Account(AbstractBaseUser, PermissionsMixin):
     id: BigAutoField
@@ -55,20 +59,32 @@ class Account(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("email address"),
         unique=True
     )
+    email_verified = BooleanField(
+        verbose_name=_("email verified"),
+        default=False,
+        help_text=_(
+            "Designates whether the user's email is verified."
+        )
+    )
     is_staff = BooleanField(
-        _("staff status"),
+        verbose_name=_("staff status"),
         default=False,
         help_text=_(
             "Designates whether the user can log into this admin site."
         ),
     )
     is_active = BooleanField(
-        _("active"),
-        default=True,
+        verbose_name=_("active"),
+        default=False,
         help_text=_(
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
         ),
+    )
+    created_at = DateTimeField(
+        verbose_name=_("creation date and time"),
+        auto_now_add=True,
+        help_text="The date and time when this account was created."
     )
 
     objects = AccountManager()

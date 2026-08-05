@@ -13,25 +13,26 @@ from rest_framework.status import (
 from ..serializers import (
     AccountChangePasswordSerializer,
     AccountForgotPasswordSerializer,
+    AccountForgotPasswordVerifySerializer,
     AccountLoginSerializer,
     AccountLogoutSerializer,
+    AccountResetPasswordSerializer,
     AccountSerializer,
     AccountTokenRefreshSerializer,
-    AccountForgotPasswordVerifySerializer,
-    AccountResetPasswordSerializer
+    AccountVerifyEmailSerializer,
 )
 from .examples import (
     email_not_found_error_example,
     invalid_email_error_example,
+    invalid_reset_token_error_example,
     login_authentication_failed_error_example,
     logout_validation_error_example,
+    non_field_email_not_found_error_example,
     not_authenticated_error_example,
     otp_rate_limited_error_example,
+    reset_rate_limited_error_example,
     signup_validation_error_example,
     token_not_valid_error_example,
-    reset_rate_limited_error_example,
-    invalid_reset_token_error_example,
-    non_field_email_not_found_error_example
 )
 from .responses import not_authenticated_response
 
@@ -44,6 +45,20 @@ account_signup_schema = extend_schema_view(
                 response=StandardizedErrorResponseSerializer,
                 description="Validation error",
                 examples=[signup_validation_error_example]
+            )
+        }
+    )
+)
+
+account_verify_email_schema = extend_schema_view(
+    post=extend_schema(
+        request=AccountVerifyEmailSerializer,
+        responses={
+            HTTP_200_OK: AccountVerifyEmailSerializer,
+            HTTP_400_BAD_REQUEST: OpenApiResponse(
+                response=StandardizedErrorResponseSerializer,
+                description="Validation error",
+                examples=[]
             )
         }
     )

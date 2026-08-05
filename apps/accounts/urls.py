@@ -2,39 +2,45 @@ from django.urls import include, path
 
 from .views import (
     AccountChangePasswordView,
+    AccountForgotPasswordVerifyView,
     AccountForgotPasswordView,
     AccountLoginView,
     AccountLogoutView,
     AccountMeView,
+    AccountResetPasswordView,
     AccountSignupView,
     AccountTokenRefreshView,
-    AccountForgotPasswordVerifyView,
-    AccountResetPasswordView
+    AccountVerifyEmailView,
 )
 
 urlpatterns = [
     path(
         "signup/",
         AccountSignupView.as_view(),
-        name="api_account_signup"
+        name="api-account-signup"
     ),
-    path("login/", AccountLoginView.as_view(), name="api_account_login"),
+    path(
+        "verify-email/",
+        AccountVerifyEmailView.as_view(),
+        name="api-account-verify-email"
+    ),
+    path("login/", AccountLoginView.as_view(), name="api-account-login"),
     path(
         "logout/",
         AccountLogoutView.as_view(),
-        name="api_account_logout"
+        name="api-account-logout"
     ),
-    path("me/", AccountMeView.as_view(), name="api_account_me"),
+    path("me/", AccountMeView.as_view(), name="api-account-me"),
     path(
         "token/refresh/",
         AccountTokenRefreshView.as_view(),
-        name="api_account_token_refresh"
+        name="api-account-token-refresh"
     ),
     path("password/", include([
         path(
             "change/",
             AccountChangePasswordView.as_view(),
-            name="api_account_password_change"
+            name="api-account-password-change"
         ),
         path(
             "forgot/",
@@ -42,19 +48,19 @@ urlpatterns = [
                 path(
                     '',
                     AccountForgotPasswordView.as_view(),
-                    name="api_account_password_forgot"
+                    name="api-account-password-forgot"
                 ),
                 path(
                     "verify/",
                     AccountForgotPasswordVerifyView.as_view(),
-                    name="api_account_password_forgot_verify"
+                    name="api-account-password-forgot-verify"
                 )
             ])
         ),
         path(
             "reset/",
             AccountResetPasswordView.as_view(),
-            name="api_account_password_reset"
-            )
+            name="api-account-password-reset"
+        )
     ]))
 ]

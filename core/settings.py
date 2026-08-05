@@ -227,3 +227,6 @@ PHONENUMBER_DEFAULT_REGION = "UZ"
 
 # Auth User Model
 AUTH_USER_MODEL = "accounts.Account"
+
+# Frontend URL
+FRONTEND_URL = config(option="FRONTEND_URL", default='', cast=str)

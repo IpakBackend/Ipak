@@ -1,4 +1,9 @@
+from datetime import datetime
+
 from django.contrib.auth import authenticate
+from django.db import transaction
+from django.utils import timezone
+from rest_framework.fields import empty
 from rest_framework.request import Request
 from rest_framework.serializers import (
     CharField,
@@ -6,12 +11,14 @@ from rest_framework.serializers import (
     ModelSerializer,
     Serializer,
 )
+from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Account
 from .services import AuthService
+from .validators import AccountUniqueValidator
 
 
 class SessionSerializer(Serializer):
@@ -31,20 +38,45 @@ class TokensSerializer(Serializer):
 class AccountSerializer(ModelSerializer):
     class Meta:
         model = Account
-        fields = "id", "username", "password", "is_active"
-        read_only_fields = "id", "is_active"
+        fields = "username", "email", "password"
         extra_kwargs = {
-            "password": {"write_only": True},
+            "username": {"write_only": True},
+            "password": {"write_only": True}
         }
 
     def create(self, validated_data: dict) -> Account:
         account = Account.objects.create_user(  # type:ignore
             username=validated_data["username"],
+            email=validated_data["email"],
             password=validated_data["password"]
         )
         account.save()
 
         return account
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        for field in "username", "email":
+            validators = self.fields[field].validators
+
+            for i, validator in enumerate(validators):
+                if isinstance(validator, UniqueValidator):
+                    validators[i] = AccountUniqueValidator(
+                        queryset=validator.queryset,
+                        message=validator.message
+                    )
+                    break
+
+
+class AccountVerifyEmailSerializer(Serializer):
+    token = CharField(
+        allow_blank=False,
+        trim_whitespace=True,
+        max_length=512,
+        write_only=True
+    )
+    email = EmailField(read_only=True)
 
 
 class AccountLoginSerializer(Serializer):

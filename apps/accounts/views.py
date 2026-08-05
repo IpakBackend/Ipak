@@ -1,5 +1,7 @@
 from accounts.models import Account
 from django.contrib.auth import authenticate
+from django.core import signing
+from django.core.signing import BadSignature, SignatureExpired
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,27 +11,29 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CON
 from rest_framework.views import APIView, Response
 from rest_framework_simplejwt.views import TokenRefreshView
 
-
 from .schema.schemas import (  # account_token_refresh_schema,
     account_forgot_password_schema,
+    account_forgot_password_verify_schema,
     account_login_schema,
     account_logout_schema,
     account_me_schema,
+    account_password_reset_schema,
     account_signup_schema,
-    account_forgot_password_verify_schema,
-    account_password_reset_schema
+    account_verify_email_schema,
 )
 from .serializers import (
     AccountChangePasswordSerializer,
     AccountForgotPasswordSerializer,
+    AccountForgotPasswordVerifySerializer,
     AccountLoginSerializer,
     AccountLogoutSerializer,
+    AccountResetPasswordSerializer,
     AccountSerializer,
     AccountTokenRefreshSerializer,
-    AccountForgotPasswordVerifySerializer,
-    AccountResetPasswordSerializer
+    AccountVerifyEmailSerializer,
 )
 from .services import AuthService, OTPService
+from .services.mail import send_email_verification_link
 
 # Create your views here.
 
@@ -44,14 +48,78 @@ class AccountSignupView(APIView):
         serializer.is_valid(raise_exception=True)
 
         account: Account = serializer.save()  # type:ignore
-        data: dict[str, int | str | bool] = dict(AccountSerializer(account).data) | AuthService.issue_tokens(
-            user=account,
-            request=request._request
-        )
+        email: str = account.email
+
+        try:
+            send_email_verification_link(
+                user_id=account.id, email=email
+            )
+
+            return Response(
+                data={"email": email},
+                status=HTTP_201_CREATED
+            )
+        except Exception:
+            account.delete()
+
+            raise ValidationError(
+                detail={"email": ["Failed to send email"]},
+                code="invalid"
+            )
+
+
+@account_verify_email_schema
+class AccountVerifyEmailView(APIView):
+    serializer_class = AccountVerifyEmailSerializer
+    permission_classes = AllowAny,
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token: str = serializer.validated_data["token"]  # type:ignore
+
+        try:
+            data: dict[str, str] = signing.loads(
+                s=token,
+                salt="email-verification",
+                max_age=60 * 5
+            )
+        except SignatureExpired:
+            raise ValidationError(
+                detail={"token": ["Verification link has expired."]},
+                code="invalid"
+            )
+        except BadSignature:
+            raise ValidationError(
+                detail={"token": ["Invalid verification link."]},
+                code="invalid"
+            )
+
+        try:
+            account: Account = Account.objects.get(pk=data["user_id"])
+        except Account.DoesNotExist:
+            raise ValidationError(
+                detail={"token": ["Invalid verification link."]},
+                code="invalid"
+            )
+
+        if account.email_verified:
+            raise ValidationError(
+                detail="Email is already verified.",
+                code="already_verified"
+            )
+
+        account.email_verified = True
+        account.is_active = True
+        account.save(update_fields=[
+            "email_verified",
+            "is_active"
+        ])
 
         return Response(
-            data=data,
-            status=HTTP_201_CREATED
+            data={"email": account.email},
+            status=HTTP_200_OK
         )
 
 
@@ -184,9 +252,10 @@ class AccountForgotPasswordView(APIView):
         try:
             OTPService.send_otp_code(email=email, otp_code=otp_code)
 
-            return Response({
-                "email": email,
-            })
+            return Response(
+                data={"email": email},
+                status=HTTP_200_OK
+            )
         except Exception:
             OTPService.delete_otp(email=email)
 
@@ -219,10 +288,13 @@ class AccountForgotPasswordVerifyView(APIView):
         OTPService.check_otp(email=email, otp_code=otp_code)
         OTPService.delete_otp(email=email)
 
-        return Response({
-            "email": email,
-            "reset_token": OTPService.generate_reset_token(email=email)
-        })
+        return Response(
+            data={
+                "email": email,
+                "reset_token": OTPService.generate_reset_token(email=email)
+            },
+            status=HTTP_200_OK
+        )
 
 
 @account_password_reset_schema
