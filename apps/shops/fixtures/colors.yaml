@@ -1,0 +1,48 @@
+colors:
+  - name: "black"
+    hex: "#000000"
+
+  - name: "gray"
+    hex: "#808080"
+
+  - name: "white"
+    hex: "#FFFFFF"
+
+  - name: "red"
+    hex: "#FF0000"
+
+  - name: "orange"
+    hex: "#FFA500"
+
+  - name: "yellow"
+    hex: "#FFFF00"
+
+  - name: "green"
+    hex: "#00C000"
+
+  - name: "teal"
+    hex: "#00C090"
+
+  - name: "cyan"
+    hex: "#00FFFF"
+
+  - name: "blue"
+    hex: "#0000FF"
+
+  - name: "purple"
+    hex: "#C000FF"
+
+  - name: "magenta"
+    hex: "#FF00FF"
+
+  - name: "pink"
+    hex: "#FFC0CB"
+
+  - name: "beige"
+    hex: "#FFE4C4"  
+
+  - name: "brown"
+    hex: "#402000"
+
+  - name: "burgundy"
+    hex: "#800020"

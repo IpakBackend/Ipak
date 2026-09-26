@@ -4,7 +4,7 @@ from django.core import signing
 from django.core.signing import BadSignature, SignatureExpired
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -41,7 +41,6 @@ from .services.mail import send_email_verification_link
 @account_signup_schema
 class AccountSignupView(APIView):
     serializer_class = AccountSerializer
-    permission_classes = AllowAny,
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -71,7 +70,6 @@ class AccountSignupView(APIView):
 @account_verify_email_schema
 class AccountVerifyEmailView(APIView):
     serializer_class = AccountVerifyEmailSerializer
-    permission_classes = AllowAny,
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -126,7 +124,6 @@ class AccountVerifyEmailView(APIView):
 @account_login_schema
 class AccountLoginView(APIView):
     serializer_class = AccountLoginSerializer
-    permission_classes = AllowAny,
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -156,9 +153,8 @@ class AccountLogoutView(APIView):
             raise ValidationError(detail="Missing session id", code="required")
 
         refresh_token = AuthService.validate_refresh_token(
-            refresh_token=serializer.validated_data[  # type:ignore
-                "refresh_token"
-            ],
+            refresh_token=serializer.
+            validated_data["refresh_token"],  # type:ignore
             user_id=user_id,
             sid=sid
         )
@@ -237,7 +233,7 @@ class AccountForgotPasswordView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        email = serializer.validated_data["email"]  # type:ignore
+        email: str = serializer.validated_data["email"]  # type:ignore
         account: Account | None = Account.objects.filter(
             email=email, is_active=True
         ).first()

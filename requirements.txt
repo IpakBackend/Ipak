@@ -1,4 +1,9 @@
+cloudinary
 django
+django-admin-interface
+django-cloudinary-storage
+django-colorfield
+django-countries
 django-filter
 django-ipware
 django-phonenumber-field[phonenumbers]
@@ -10,3 +15,4 @@ drf-standardized-errors
 psycopg2-binary
 python-decouple
 redis
+whitenoise

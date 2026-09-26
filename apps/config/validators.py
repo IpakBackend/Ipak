@@ -19,3 +19,8 @@ username_validators = [
     ),
     latin_username_validator,
 ]
+
+hexadecimal_validator = RegexValidator(
+    regex=r"^[0-9A-F]{6}$",
+    message="Enter a valid hexadecimal color (e.g. FF0000)."
+)

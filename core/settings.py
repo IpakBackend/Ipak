@@ -37,13 +37,21 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    "django.contrib.postgres",
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "admin_interface",
+    "colorfield",
+
+    'django.contrib.admin',
+
+    "cloudinary_storage",
+    "cloudinary",
+    "django_countries",
     "drf_spectacular",
     "drf_standardized_errors",
     "phonenumber_field",
@@ -58,6 +66,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.locale.LocaleMiddleware"
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -219,7 +229,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+STATIC_URL = "static/"
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
+
+# Cloudinary
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": config(option="CLOUDINARY_CLOUD_NAME", default='', cast=str),
+    "API_KEY": config(option="CLOUDINARY_API_KEY", default='', cast=str),
+    "API_SECRET": config(option="CLOUDINARY_API_SECRET", default='', cast=str),
+}
 
 # Phone number field settings
 
