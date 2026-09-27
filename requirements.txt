@@ -12,7 +12,7 @@ django-rest-framework
 djangorestframework-simplejwt
 drf-spectacular
 drf-standardized-errors
-psycopg2-binary
+psycopg[binary]
 python-decouple
 redis
 whitenoise

@@ -14,6 +14,13 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
+try:
+    import django.contrib.gis.db.backends.postgis.base
+except Exception as exc:
+    print("=== POSTGIS BACKEND IMPORT ERROR ===")
+    print(repr(exc))
+    raise
+
 app: WSGIHandler = get_wsgi_application()
 
 application = app
