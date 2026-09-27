@@ -1,18 +1,14 @@
 {
-    "rewrites": [
+    "builds": [
         {
-            "source": "/static",
-            "destination": "/static"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "api/index.py"
+            "src": "core/wsgi.py",
+            "use": "vercel-python-gis-modern@1.0.0"
         }
     ],
-    "functions": {
-        "api/index.py": {
-            "runtime": "vercel-python-gis-modern@1.0.0"
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "core/wsgi.py"
         }
-    },
-    "buildCommand": "dnf install -y gdal310-devel geos-devel proj-devel && python manage.py collectstatic --noinput"
+    ]
 }
