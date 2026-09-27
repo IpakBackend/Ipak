@@ -12,7 +12,6 @@ django-rest-framework
 djangorestframework-simplejwt
 drf-spectacular
 drf-standardized-errors
-geodjango
 psycopg2-binary
 python-decouple
 redis
