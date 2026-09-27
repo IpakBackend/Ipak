@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.gis",
 
     "admin_interface",
     "colorfield",
@@ -150,7 +151,7 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "config.exceptions.custom_exception_handler",
     "DATETIME_FORMAT": '%d.%m.%Y %H:%M:%S',
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 16,
 }
 
 # JWT
@@ -257,7 +258,14 @@ CLOUDINARY_STORAGE = {
 PHONENUMBER_DEFAULT_REGION = "UZ"
 
 # Auth User Model
+
 AUTH_USER_MODEL = "accounts.Account"
 
 # Frontend URL
+
 FRONTEND_URL = config(option="FRONTEND_URL", default='', cast=str)
+
+# GeoDjango
+
+GDAL_LIBRARY_PATH = config(option="GDAL_LIBRARY_PATH", default='', cast=str)
+GEOS_LIBRARY_PATH = config(option="GEOS_LIBRARY_PATH", default='', cast=str)

@@ -2,6 +2,7 @@ from typing import Any
 
 from colorfield.fields import ColorField
 from config.validators import hexadecimal_validator
+from django.contrib.gis.db.models import PointField
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
     CASCADE,
@@ -22,6 +23,17 @@ SIZE_SYSTEM_CHOICES = [
 ]
 
 ALPHA_SIZES = {"XXS", "XS", 'S', 'M', 'L', "XL", "XXL", "3XL", "4XL"}
+
+CATEGORY_CHOICES = [
+    ("shoes", "Shoes"),
+    ("tops", "Tops"),
+    ("bottoms", "Bottoms"),
+    ("dresses", "Dresses"),
+    ("outerwear", "Outerwear"),
+    ("underwear", "Underwear"),
+    ("accessories", "Accessories"),
+    ("others", "Others")
+]
 
 # Create your models here.
 
@@ -60,13 +72,18 @@ class Shop(Model):
     phone_number = PhoneNumberField()
     contact_information = CharField(max_length=64, blank=True)
     opening_hours = CharField(max_length=128)
-    latitude = FloatField()
-    longitude = FloatField()
+    location = PointField(geography=True, srid=4326)
     owner = ForeignKey(to="accounts.Account", on_delete=CASCADE)
 
 
 class Product(Model):
     name = CharField(max_length=32)
+    category = CharField(
+        max_length=16,
+        default="others",
+        choices=CATEGORY_CHOICES
+    )
+    material = CharField(max_length=32, blank=True)
     description = CharField(max_length=255)
     brand = CharField(max_length=32)
     manufacturer_country = CountryField(null=True)
