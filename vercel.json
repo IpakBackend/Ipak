@@ -13,5 +13,6 @@
         "api/index.py": {
             "runtime": "git+https://github.com/jperelli/vercel-python-gis.git#main@1.0.0"
         }
-    }
+    },
+    "buildCommand": "dnf install -y gdal310-devel geos-devel proj-devel && python manage.py collectstatic --noinput"
 }
