@@ -1,16 +1,12 @@
 {
     "rewrites": [
         {
-            "source": "/static",
-            "destination": "/static"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "api/index.py"
+            "source": "/static/(.*)",
+            "destination": "/static/$1"
         }
     ],
     "functions": {
-        "api/index.py": {
+        "core/wsgi.py": {
             "runtime": "vercel-python-gis-runtime@1.1.1"
         }
     }

@@ -33,21 +33,6 @@ DEBUG = config(option="DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
-# GeoDjango
-
-# GDAL_LIBRARY_PATH = config(
-#     option="GDAL_LIBRARY_PATH",
-#     default="/var/task/lib/libgdal.so",
-#     cast=str
-# )
-# GEOS_LIBRARY_PATH = config(
-#     option="GEOS_LIBRARY_PATH",
-#     default="/var/task/lib/libgeos_c.so.1",
-#     cast=str
-# )
-GDAL_LIBRARY_PATH = "libgdal.so"
-GEOS_LIBRARY_PATH = "libgeos_c.so.1"
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -278,3 +263,19 @@ AUTH_USER_MODEL = "accounts.Account"
 # Frontend URL
 
 FRONTEND_URL = config(option="FRONTEND_URL", default='', cast=str)
+
+# GeoDjango
+
+# GDAL_LIBRARY_PATH = config(
+#     option="GDAL_LIBRARY_PATH",
+#     default="/var/task/lib/libgdal.so",
+#     cast=str
+# )
+# GEOS_LIBRARY_PATH = config(
+#     option="GEOS_LIBRARY_PATH",
+#     default="/var/task/lib/libgeos_c.so.1",
+#     cast=str
+# )
+PROJ_LIBRARY_PATH = "libproj.so"
+GDAL_LIBRARY_PATH = "libgdal.so"
+GEOS_LIBRARY_PATH = "libgeos_c.so.1"
