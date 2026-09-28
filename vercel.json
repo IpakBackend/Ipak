@@ -2,7 +2,7 @@
     "builds": [
         {
             "src": "core/wsgi.py",
-            "use": "vercel-python-gis-modern@1.0.3"
+            "use": "vercel-python-gis-modern@1.0.4"
         }
     ],
     "rewrites": [
