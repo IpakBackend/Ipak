@@ -1,29 +1,32 @@
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django.db.models import QuerySet
-from django_filters.rest_framework import FilterSet, NumberFilter
+from django_filters.rest_framework import CharFilter, FilterSet
 
 from .models import Product, Shop
 
 
 class ProximityFilterSet(FilterSet):
-    latitude = NumberFilter()
-    longitude = NumberFilter()
-    radius = NumberFilter()
+    proximity = CharFilter(method="filter_proximity")
 
     location_field: str
 
-    def filter_queryset(self, queryset: QuerySet) -> QuerySet:
-        queryset = super().filter_queryset(queryset)
-
-        latitude: float | None = self.form.cleaned_data.get("latitude")
-        longitude: float | None = self.form.cleaned_data.get("longitude")
-        radius: float | None = self.form.cleaned_data.get("radius")
-
-        if latitude is None or longitude is None or radius is None:
+    def filter_proximity(
+            self,
+            queryset: QuerySet,
+            name: str,
+            value: str
+    ) -> QuerySet:
+        try:
+            latitude, longitude, radius = map(float, value.split(","))
+        except ValueError:
             return queryset
 
-        point = Point(x=longitude, y=latitude, srid=4326)
+        point = Point(
+            x=longitude,
+            y=latitude,
+            srid=4326,
+        )
 
         return queryset.filter(
             **{
@@ -43,7 +46,7 @@ class ShopFilter(ProximityFilterSet):
 
     class Meta:  # type:ignore
         model = Shop
-        fields = "name", "address", "latitude", "longitude", "radius"
+        fields = "name", "address"
 
 
 class ProductFilter(ProximityFilterSet):
@@ -51,6 +54,5 @@ class ProductFilter(ProximityFilterSet):
 
     class Meta:  # type:ignore
         model = Product
-        fields = "name",  "category", "material", \
-            "brand", "manufacturer_country", "colors", \
-            "is_available", "latitude", "longitude", "radius"
+        fields = "name",  "category", "material", "brand", \
+            "manufacturer_country", "colors", "is_available"
