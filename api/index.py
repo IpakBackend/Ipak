@@ -1,1 +1,1 @@
-from core.wsgi import application
+from core.wsgi import app, application

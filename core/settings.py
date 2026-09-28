@@ -35,16 +35,18 @@ ALLOWED_HOSTS = ['*']
 
 # GeoDjango
 
-GDAL_LIBRARY_PATH = config(
-    option="GDAL_LIBRARY_PATH",
-    default="/var/task/lib/libgdal.so",
-    cast=str
-)
-GEOS_LIBRARY_PATH = config(
-    option="GEOS_LIBRARY_PATH",
-    default="/var/task/lib/libgeos_c.so.1",
-    cast=str
-)
+# GDAL_LIBRARY_PATH = config(
+#     option="GDAL_LIBRARY_PATH",
+#     default="/var/task/lib/libgdal.so",
+#     cast=str
+# )
+# GEOS_LIBRARY_PATH = config(
+#     option="GEOS_LIBRARY_PATH",
+#     default="/var/task/lib/libgeos_c.so.1",
+#     cast=str
+# )
+GDAL_LIBRARY_PATH = "libgdal.so"
+GEOS_LIBRARY_PATH = "libgeos_c.so.1"
 
 # Application definition
 

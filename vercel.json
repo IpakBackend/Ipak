@@ -1,14 +1,17 @@
 {
-    "builds": [
-        {
-            "src": "core/wsgi.py",
-            "use": "vercel-python-gis-modern@1.0.4"
-        }
-    ],
     "rewrites": [
         {
+            "source": "/static",
+            "destination": "/static"
+        },
+        {
             "source": "/(.*)",
-            "destination": "core/wsgi.py"
+            "destination": "api/index.py"
         }
-    ]
+    ],
+    "functions": {
+        "api/index.py": {
+            "runtime": "vercel-python-gis-runtime@1.1.1"
+        }
+    }
 }
