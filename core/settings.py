@@ -267,7 +267,7 @@ FRONTEND_URL = config(option="FRONTEND_URL", default='', cast=str)
 # GeoDjango
 
 PROJ_LIBRARY_PATH = config(
-    "PROJ_LIBRARY_PATH",
+    option="PROJ_LIBRARY_PATH",
     default="libproj.so",
     cast=str
 )
