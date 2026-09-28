@@ -1,13 +1,14 @@
 {
-    "rewrites": [
+    "builds": [
         {
-            "source": "/static/(.*)",
-            "destination": "/static/$1"
+            "src": "core/wsgi.py",
+            "use": "vercel-python-gis-runtime@1.1.1"
         }
     ],
-    "functions": {
-        "core/wsgi.py": {
-            "runtime": "vercel-python-gis-runtime@1.1.1"
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "core/wsgi.py"
         }
-    }
+    ]
 }
