@@ -1,19 +1,21 @@
 from typing import Any
 
 from colorfield.fields import ColorField
-from config.validators import hexadecimal_validator
 from django.contrib.gis.db.models import PointField
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
     CASCADE,
     BooleanField,
     CharField,
-    FloatField,
     ForeignKey,
+    ImageField,
     Manager,
     ManyToManyField,
     Model,
+    PositiveSmallIntegerField,
+    UniqueConstraint,
 )
+from django.db.models.manager import Manager
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -33,6 +35,12 @@ CATEGORY_CHOICES = [
     ("underwear", "Underwear"),
     ("accessories", "Accessories"),
     ("others", "Others")
+]
+
+GENDER_CHOICES = [
+    ("male", "Male"),
+    ("female", "Female"),
+    ("unisex", "Unisex")
 ]
 
 # Create your models here.
@@ -84,6 +92,7 @@ class Product(Model):
         choices=CATEGORY_CHOICES
     )
     material = CharField(max_length=32, blank=True)
+    gender = CharField(max_length=6, choices=GENDER_CHOICES, default="unisex")
     description = CharField(max_length=255)
     brand = CharField(max_length=32)
     manufacturer_country = CountryField(null=True)
@@ -99,3 +108,19 @@ class Product(Model):
     colors = ManyToManyField(to=Color)
     shop = ForeignKey(to=Shop, on_delete=CASCADE)
     is_available = BooleanField(default=True)
+    images: Manager["ProductImage"]
+
+
+class ProductImage(Model):
+    product = ForeignKey(to=Product, on_delete=CASCADE, related_name="images")
+    image = ImageField(upload_to="products/")
+    position = PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["product", "position"],
+                name="unique_product_image_position"
+            )
+        ]
+        ordering = "product", "-position"

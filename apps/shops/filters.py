@@ -54,5 +54,5 @@ class ProductFilter(ProximityFilterSet):
 
     class Meta:  # type:ignore
         model = Product
-        fields = "name",  "category", "material", "brand", \
+        fields = "name", "gender", "category", "material", "brand", \
             "manufacturer_country", "colors", "is_available"

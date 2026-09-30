@@ -1,6 +1,14 @@
-from rest_framework.serializers import JSONField, ModelSerializer, SerializerMethodField
+from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import (
+    IntegerField,
+    JSONField,
+    ListField,
+    ModelSerializer,
+    Serializer,
+    SerializerMethodField,
+)
 
-from .models import Color, Product, Shop
+from .models import Color, Product, ProductImage, Shop
 
 
 class ColorSerializer(ModelSerializer):
@@ -29,10 +37,47 @@ class ShopSerializer(ModelSerializer):
         serializer.save(owner=self.context["request"].user)
 
 
+class ProductImageSerializer(ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = "id", "image", "position"
+        read_only_fields = "id", "position"
+
+
 class ProductSerializer(ModelSerializer):
+    images = ProductImageSerializer(many=True)
+
     class Meta:
         model = Product
-        fields = "id", "name", "material", "category", \
+        fields = "id", "name", "gender", "material", "category", \
             "description", "brand", "manufacturer_country", \
-            "size_system", "sizes", "colors", "shop", "is_available"
-        read_only_fields = "id", "shop"
+            "size_system", "sizes", "colors", "shop", "is_available", "images"
+        read_only_fields = "id", "shop", "images"
+
+
+class ProductImageOrderSerializer(Serializer):
+    images = ListField(child=IntegerField(min_value=1), min_length=1)
+
+    def validate_images(self, value):
+        product: Product = self.context["product"]
+
+        if len(value) != product.images.count():
+            raise ValidationError(
+                "All product images must be included."
+            )
+
+        if len(value) != len(set(value)):
+            raise ValidationError(
+                "Image IDs must be unique."
+            )
+
+        actual_ids = set(
+            product.images.values_list("id", flat=True)
+        )
+
+        if set(value) != actual_ids:
+            raise ValidationError(
+                "Invalid image IDs."
+            )
+
+        return value
